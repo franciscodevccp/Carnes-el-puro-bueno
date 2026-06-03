@@ -34,7 +34,7 @@ export function AddToCartButton({
       className={className}
       onClick={() => {
         addItem(product);
-        toast.success("Agregado al carro 🔥", { description: product.name });
+        toast.success("Agregado al carro", { description: product.name });
       }}
     >
       {withIcon && <ShoppingCartSimple weight="bold" />}

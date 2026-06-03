@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Minus, Plus, Trash } from "@phosphor-icons/react";
+import { toast } from "sonner";
 
 import { Logo } from "@/components/Logo";
 import { ProductImage } from "@/components/ProductImage";
@@ -21,6 +23,11 @@ import { formatPrice } from "@/lib/utils";
 /** Drawer del carrito — global, controlado por el estado del CartProvider. */
 export function CartSheet() {
   const { items, count, subtotal, isOpen, setOpen, closeCart } = useCart();
+
+  // Al abrir el carrito, cierra cualquier notificación abierta.
+  useEffect(() => {
+    if (isOpen) toast.dismiss();
+  }, [isOpen]);
 
   return (
     <Sheet open={isOpen} onOpenChange={setOpen}>

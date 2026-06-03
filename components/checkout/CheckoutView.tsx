@@ -14,8 +14,9 @@ import {
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 
-import { Field, Input, RadioCard, Select } from "@/components/form";
+import { Field, Input, RadioCard } from "@/components/form";
 import { Logo } from "@/components/Logo";
+import { SelectMenu } from "@/components/SelectMenu";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { site } from "@/lib/site";
@@ -28,11 +29,17 @@ type Doc = "boleta" | "factura";
 const stepClass =
   "font-display text-base uppercase tracking-[0.04em] text-hueso";
 
+const COMUNA_OPTIONS = [
+  ...site.shipping.zones.map((z) => ({ value: z, label: z })),
+  { value: "otra", label: "Otra" },
+];
+
 export function CheckoutView() {
   const { items, subtotal, clear } = useCart();
   const [delivery, setDelivery] = useState<Delivery>("retiro");
   const [payment, setPayment] = useState<Payment>("webpay");
   const [doc, setDoc] = useState<Doc>("boleta");
+  const [comuna, setComuna] = useState("");
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -88,6 +95,10 @@ export function CheckoutView() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (delivery === "delivery" && !comuna) {
+      toast.error("Elige una comuna para el despacho.");
+      return;
+    }
     if (payment === "webpay") {
       setProcessing(true);
       setTimeout(() => {
@@ -149,18 +160,14 @@ export function CheckoutView() {
                 </Field>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Comuna" htmlFor="comuna" required>
-                  <Select id="comuna" name="comuna" required defaultValue="">
-                    <option value="" disabled>
-                      Selecciona…
-                    </option>
-                    {site.shipping.zones.map((z) => (
-                      <option key={z} value={z}>
-                        {z}
-                      </option>
-                    ))}
-                    <option value="otra">Otra</option>
-                  </Select>
+                <Field label="Comuna" required>
+                  <SelectMenu
+                    value={comuna}
+                    onValueChange={setComuna}
+                    options={COMUNA_OPTIONS}
+                    ariaLabel="Comuna"
+                    className="flex h-11 w-full"
+                  />
                 </Field>
                 <Field label="Referencia (opcional)" htmlFor="ref">
                   <Input id="ref" name="referencia" />

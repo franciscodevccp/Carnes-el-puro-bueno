@@ -41,7 +41,7 @@ export function ProductActions({ product }: { product: Product }) {
         className="sm:min-w-48"
         onClick={() => {
           addItem(product, qty);
-          toast.success("Agregado al carro 🔥", {
+          toast.success("Agregado al carro", {
             description: `${qty} × ${product.name}`,
           });
         }}

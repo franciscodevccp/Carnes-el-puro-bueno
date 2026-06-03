@@ -1,0 +1,211 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Dark-only: la clase .dark vive SIEMPRE en <html> (sin light mode, sin toggle).
+   Solo está para activar las variantes dark: internas de los componentes shadcn. */
+@custom-variant dark (&:is(.dark *));
+
+/* Variantes shorthand que usan los componentes shadcn (estilo radix-nova) para las
+   animaciones y estados de Radix. Normalmente las escribe `shadcn init` en este
+   archivo; las definimos a mano porque el init se abortó antes de llegar a este paso. */
+@custom-variant data-open (&:is([data-state="open"], [data-open]));
+@custom-variant data-closed (&:is([data-state="closed"], [data-closed]));
+@custom-variant data-active (&:is([data-state="active"], [data-active]));
+@custom-variant data-inset (&[data-inset]);
+@custom-variant data-disabled (&:is([data-disabled], :disabled));
+@custom-variant data-horizontal (&[data-orientation="horizontal"]);
+@custom-variant data-vertical (&[data-orientation="vertical"]);
+
+/* ============================================================
+   Tokens de marca — "Carbón y Brasa"  (docs/design.md §3–§5)
+   Generan utilidades: bg-carbon, text-hueso, text-rojo, border-linea,
+   font-display, rounded-lg, etc.
+   ============================================================ */
+@theme {
+  /* Superficies */
+  --color-carbon: #0e0e0f;
+  --color-grafito: #18181b;
+  --color-grafito-2: #232327;
+
+  /* Marca */
+  --color-rojo: #d81f26;
+  --color-rojo-hover: #b81a20;
+  --color-rojo-sangre: #8c1014;
+
+  /* Texto */
+  --color-hueso: #f4f0e9;
+  --color-humo: #a39e96;
+  --color-humo-2: #6e6a63;
+
+  /* Acento rústico (usar poco) */
+  --color-kraft: #b07d52;
+
+  /* Semánticos */
+  --color-success: #57b894;
+  --color-warning: #e0a53b;
+  --color-error: #ff5a5a;
+
+  /* Líneas / divisores */
+  --color-linea: rgba(244, 240, 233, 0.1);
+  --color-linea-fuerte: rgba(244, 240, 233, 0.22);
+
+  /* Tipografía — next/font define --font-oswald/archivo/yellowtail en <html> */
+  --font-display: var(--font-oswald), "Arial Narrow", system-ui, sans-serif;
+  --font-body: var(--font-archivo), system-ui, -apple-system, sans-serif;
+  --font-script: var(--font-yellowtail), cursive;
+
+  /* Radios */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* Animación del ticker (announcement bar) — derecha → izquierda, en loop */
+  --animate-marquee: marquee 35s linear infinite;
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+/* ============================================================
+   Tokens semánticos de shadcn/ui mapeados a la paleta de marca.
+   Dark-only → estos valores ya SON los oscuros (no hay bloque light).
+   ============================================================ */
+:root {
+  --radius: 8px;
+
+  --background: #0e0e0f; /* carbon */
+  --foreground: #f4f0e9; /* hueso */
+
+  --card: #18181b; /* grafito */
+  --card-foreground: #f4f0e9; /* hueso */
+
+  --popover: #232327; /* grafito-2 */
+  --popover-foreground: #f4f0e9; /* hueso */
+
+  --primary: #d81f26; /* rojo */
+  --primary-foreground: #f4f0e9; /* hueso */
+
+  --secondary: #232327; /* grafito-2 */
+  --secondary-foreground: #f4f0e9; /* hueso */
+
+  --muted: #18181b; /* grafito */
+  --muted-foreground: #a39e96; /* humo */
+
+  --accent: #232327; /* grafito-2 */
+  --accent-foreground: #f4f0e9; /* hueso */
+
+  --destructive: #ff5a5a; /* error (distinto del rojo de marca) */
+  --destructive-foreground: #f4f0e9;
+
+  --border: rgba(244, 240, 233, 0.1); /* linea */
+  --input: rgba(244, 240, 233, 0.22); /* linea-fuerte */
+  --ring: #d81f26; /* rojo (focus) */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    background-color: var(--color-carbon);
+    color: var(--color-hueso);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-rojo);
+    color: var(--color-hueso);
+  }
+
+  /* Respeta prefers-reduced-motion (a11y / design.md §9) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    /* El ticker de promos es contenido pedido: se sigue moviendo. */
+    .animate-marquee {
+      animation: var(--animate-marquee) !important;
+    }
+  }
+}
+
+/* ============================================================
+   Escala tipográfica reutilizable (docs/design.md §4)
+   Úsala en lugar de repetir combinaciones de clases.
+   ============================================================ */
+@layer components {
+  .site-container {
+    @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6;
+  }
+  .text-display {
+    @apply font-display font-bold uppercase tracking-[0.01em];
+    font-size: clamp(2.75rem, 7vw, 5rem);
+    line-height: 0.95;
+  }
+  .text-h1 {
+    @apply font-display font-bold uppercase tracking-[0.01em];
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    line-height: 1;
+  }
+  .text-h2 {
+    @apply font-display font-semibold uppercase tracking-[0.01em];
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.05;
+  }
+  .text-h3 {
+    @apply font-display font-semibold uppercase tracking-[0.01em];
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+  .eyebrow {
+    @apply font-body font-medium uppercase text-humo;
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+  }
+  .text-price {
+    @apply font-display font-semibold tabular-nums text-hueso;
+  }
+}
